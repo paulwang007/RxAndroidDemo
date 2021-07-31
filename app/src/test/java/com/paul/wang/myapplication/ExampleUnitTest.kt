@@ -1,4 +1,4 @@
-package com.paul.wang.rxandroiddemo
+package com.paul.wang.myapplication
 
 import org.junit.Test
 
