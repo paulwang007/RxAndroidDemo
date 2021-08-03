@@ -23,17 +23,16 @@ class MainActivity : AppCompatActivity() {
         val observable = Observable.just("ab")
         // fromArray() will emit one item at a time when using varargs, if using a whole array, only the array will be emitted once.
         val arrayObservable = Observable.fromArray(arrayOf("a", "b", "c"))
+        // range operator emits a range of Int or Long. Could throw IllegalArgumentException if range is greater than Integer.MAX_VALUE.
+        val rangeObserver = Observable.range(1, 10)
 
         compositeDisposable.add(
             // Learning subscribeOn(), observeOn() on different Schedulers.
-            arrayObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+            rangeObserver.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
                 // A DisposableObserver essentially replaces 2 different objects, Disposable and Observer.
-                object : DisposableObserver<Array<String>>() {
-                    override fun onNext(t: Array<String>?) {
-                        t?.forEach {
-                            textView?.text = it
-                            Log.d("rxjava", it)
-                        }
+                object : DisposableObserver<Int>() {
+                    override fun onNext(t: Int) {
+                        textView?.text = t.toString()
                     }
 
                     override fun onError(e: Throwable?) {
