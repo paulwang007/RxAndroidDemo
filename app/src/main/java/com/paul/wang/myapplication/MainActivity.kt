@@ -1,11 +1,11 @@
 package com.paul.wang.myapplication
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.observers.DisposableObserver
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -24,15 +24,20 @@ class MainActivity : AppCompatActivity() {
         // fromArray() will emit one item at a time when using varargs, if using a whole array, only the array will be emitted once.
         val arrayObservable = Observable.fromArray(arrayOf("a", "b", "c"))
         // range operator emits a range of Int or Long. Could throw IllegalArgumentException if range is greater than Integer.MAX_VALUE.
-        val rangeObserver = Observable.range(1, 10)
+        val rangeObservable = Observable.range(1, 10)
+        val createObservable = Observable.create<String> {observable ->
+            arrayOf("a", "b", "c").forEach {char ->
+                observable.onNext(char)
+            }
+        }
 
         compositeDisposable.add(
             // Learning subscribeOn(), observeOn() on different Schedulers.
-            rangeObserver.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+            createObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
                 // A DisposableObserver essentially replaces 2 different objects, Disposable and Observer.
-                object : DisposableObserver<Int>() {
-                    override fun onNext(t: Int) {
-                        textView?.text = t.toString()
+                object : DisposableObserver<String>() {
+                    override fun onNext(t: String) {
+                        textView?.text = t
                     }
 
                     override fun onError(e: Throwable?) {
