@@ -9,6 +9,7 @@ import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.observers.DisposableObserver
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.util.function.Function
 
 class MainActivity : AppCompatActivity() {
     // A CompositeDisposable can be used to replace multiple Disposables or DisposableObservers are used.
@@ -25,19 +26,21 @@ class MainActivity : AppCompatActivity() {
         val arrayObservable = Observable.fromArray(arrayOf("a", "b", "c"))
         // range operator emits a range of Int or Long. Could throw IllegalArgumentException if range is greater than Integer.MAX_VALUE.
         val rangeObservable = Observable.range(1, 10)
-        val createObservable = Observable.create<String> {observable ->
-            arrayOf("a", "b", "c").forEach {char ->
+        val createObservable = Observable.create<String> { observable ->
+            arrayOf("a", "b", "c").forEach { char ->
                 observable.onNext(char)
             }
+        }.map {
+            'f'
         }
 
         compositeDisposable.add(
             // Learning subscribeOn(), observeOn() on different Schedulers.
             createObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
                 // A DisposableObserver essentially replaces 2 different objects, Disposable and Observer.
-                object : DisposableObserver<String>() {
-                    override fun onNext(t: String) {
-                        textView?.text = t
+                object : DisposableObserver<Char>() {
+                    override fun onNext(t: Char) {
+                        textView?.text = t.toString()
                     }
 
                     override fun onError(e: Throwable?) {
