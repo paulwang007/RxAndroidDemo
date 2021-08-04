@@ -26,17 +26,22 @@ class MainActivity : AppCompatActivity() {
         val arrayObservable = Observable.fromArray(arrayOf("a", "b", "c"))
         // range operator emits a range of Int or Long. Could throw IllegalArgumentException if range is greater than Integer.MAX_VALUE.
         val rangeObservable = Observable.range(1, 10)
-        val createObservable = Observable.create<String> { observable ->
-            arrayOf("a", "b", "c").forEach { char ->
-                observable.onNext(char)
+        // Observable.create<T> creates a callback, which will be invoked whenever an Observer subscribes to it. ObservableEmitter will emit type T object.
+        val createObservable = Observable.create<String> { observableEmitter ->
+            arrayOf("a", "b", "c").forEach { str ->
+                observableEmitter.onNext(str)
             }
+            observableEmitter.onComplete()
         }.map {
             'f'
         }
 
         compositeDisposable.add(
             // Learning subscribeOn(), observeOn() on different Schedulers.
-            createObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+            createObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).flatMap{
+                // Adding flatMap(), which transforms the items emitted by an Observable into Observables, then flattens the emissions from different Observables into a single Observable.
+                Observable.just('d')
+            }.subscribeWith(
                 // A DisposableObserver essentially replaces 2 different objects, Disposable and Observer.
                 object : DisposableObserver<Char>() {
                     override fun onNext(t: Char) {
