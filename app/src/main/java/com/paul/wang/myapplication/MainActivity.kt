@@ -41,11 +41,15 @@ class MainActivity : AppCompatActivity() {
                 .buffer(2) // Buffer will group emissions into bundles, then emit a bundle.
                 .flatMap {
                     // Adding flatMap(), which transforms the items emitted by an Observable into Observables, then flattens the emissions from different Observables into a single Observable.
-                    Observable.just('d')
+                    Observable.just(it)
                 }.concatMap {
                     // Concat is similar to flatMap, but it will wait until one observable is finished before moving on to the next observable.
                     Observable.just('a')
-                }.subscribeWith(
+                }.filter {
+                    // Filtering out the emissions.
+                    it == 'b'
+                }.distinct() // Suppress distinct item emitted by an Observable.
+                .subscribeWith(
                     // A DisposableObserver essentially replaces 2 different objects, Disposable and Observer.
                     object : DisposableObserver<Char>() {
                         override fun onNext(t: Char) {
