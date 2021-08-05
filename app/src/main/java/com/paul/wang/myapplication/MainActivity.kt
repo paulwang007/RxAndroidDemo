@@ -47,8 +47,11 @@ class MainActivity : AppCompatActivity() {
                     Observable.just('a')
                 }.filter {
                     // Filtering out the emissions.
-                    it == 'b'
-                }.distinct() // Suppress distinct item emitted by an Observable.
+                    it == 'a'
+                }
+//                .distinct() // Suppress distinct item emitted by an Observable.
+                .skip(3) // Skipping the first x emissions.
+                .skipLast(1) // Skipping the last x emissions.
                 .subscribeWith(
                     // A DisposableObserver essentially replaces 2 different objects, Disposable and Observer.
                     object : DisposableObserver<Char>() {
