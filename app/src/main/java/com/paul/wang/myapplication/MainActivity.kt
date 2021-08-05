@@ -41,6 +41,9 @@ class MainActivity : AppCompatActivity() {
             createObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).flatMap{
                 // Adding flatMap(), which transforms the items emitted by an Observable into Observables, then flattens the emissions from different Observables into a single Observable.
                 Observable.just('d')
+            }.concatMap {
+                // Concat is similar to flatMap, but it will wait until one observable is finished before moving on to the next observable.
+                Observable.just('a')
             }.subscribeWith(
                 // A DisposableObserver essentially replaces 2 different objects, Disposable and Observer.
                 object : DisposableObserver<Char>() {
