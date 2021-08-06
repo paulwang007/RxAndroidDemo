@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
                     // Filtering out the emissions.
                     it == 'a'
                 }
-//                .distinct() // Suppress distinct item emitted by an Observable.
+                //                .distinct() // Suppress distinct item emitted by an Observable.
                 .skip(3) // Skipping the first x emissions.
                 .skipLast(1) // Skipping the last x emissions.
                 .subscribeWith(
@@ -68,17 +68,20 @@ class MainActivity : AppCompatActivity() {
                     })
         )
 
+        compositeDisposable.add(
+            getAsyncSubject().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+                object : DisposableObserver<String>() {
+                    override fun onNext(t: String?) {
+                        textView?.text = t
+                    }
 
-        getAsyncSubject().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
-            object: DisposableObserver<String>() {
-                override fun onNext(t: String?) {
-                    textView?.text = t
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onComplete() {
+                    }
                 }
-                override fun onError(e: Throwable?) {
-                }
-                override fun onComplete() {
-                }
-            }
+            )
         )
     }
 
