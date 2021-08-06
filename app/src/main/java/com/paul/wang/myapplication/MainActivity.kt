@@ -8,6 +8,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.observers.DisposableObserver
 import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.AsyncSubject
 
 class MainActivity : AppCompatActivity() {
     // A CompositeDisposable can be used to replace multiple Disposables or DisposableObservers are used.
@@ -66,10 +67,34 @@ class MainActivity : AppCompatActivity() {
                         }
                     })
         )
+
+
+        getAsyncSubject().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+            object: DisposableObserver<String>() {
+                override fun onNext(t: String?) {
+                    textView?.text = t
+                }
+                override fun onError(e: Throwable?) {
+                }
+                override fun onComplete() {
+                }
+            }
+        )
     }
 
     override fun onPause() {
         super.onPause()
         compositeDisposable.dispose()
+    }
+
+    /**
+     * Returns an AsyncSubject.
+     */
+    private fun getAsyncSubject(): AsyncSubject<String> {
+        // Subject is like a bridge between Observable and Observer. Subject is both Observable and Observer.
+        // AsyncSubject only emits the very last item, and then completes the subscription.
+        val asyncSubject = AsyncSubject.create<String>()
+        Observable.just("a", "b", "g").subscribe(asyncSubject)
+        return asyncSubject
     }
 }
