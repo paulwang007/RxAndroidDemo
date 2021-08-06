@@ -10,6 +10,8 @@ import io.reactivex.rxjava3.observers.DisposableObserver
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.AsyncSubject
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import io.reactivex.rxjava3.subjects.PublishSubject
+import io.reactivex.rxjava3.subjects.ReplaySubject
 
 class MainActivity : AppCompatActivity() {
     // A CompositeDisposable can be used to replace multiple Disposables or DisposableObservers are used.
@@ -122,9 +124,29 @@ class MainActivity : AppCompatActivity() {
      * Returns a BehaviourSubject.
      */
     private fun getBehaviourSubject(): BehaviorSubject<String> {
-        // BehaviourSubject returns the most recent emitted item before subscribing, and all following emissions.
+        // BehaviourSubject emits the most recent emitted item before onSubscribe(), and all following emissions.
         val behaviourSubject = BehaviorSubject.create<String>()
         Observable.just("a", "b", "g").subscribe(behaviourSubject)
         return behaviourSubject
+    }
+
+    /**
+     * Returns a PublishSubject.
+     */
+    private fun getPublishSubject(): PublishSubject<String> {
+        // PublishSubject, emits all and only items after onSubscribe().
+        val publishSubject = PublishSubject.create<String>()
+        Observable.just("a", "b", "g").subscribe(publishSubject)
+        return publishSubject
+    }
+
+    /**
+     * Returns a ReplaySubject.
+     */
+    private fun getReplaySubject(): ReplaySubject<String> {
+        // ReplaySubject, emits all items from the first to the last, regardless of when the observers are subscribed.
+        val replaySubject = ReplaySubject.create<String>()
+        Observable.just("a", "b", "g").subscribe(replaySubject)
+        return replaySubject
     }
 }
