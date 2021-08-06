@@ -9,6 +9,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.observers.DisposableObserver
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.AsyncSubject
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 class MainActivity : AppCompatActivity() {
     // A CompositeDisposable can be used to replace multiple Disposables or DisposableObservers are used.
@@ -83,6 +84,22 @@ class MainActivity : AppCompatActivity() {
                 }
             )
         )
+
+        compositeDisposable.add(
+            getBehaviourSubject().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(
+                object : DisposableObserver<String>() {
+                    override fun onNext(t: String?) {
+                        textView?.text = t
+                    }
+
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onComplete() {
+                    }
+                }
+            )
+        )
     }
 
     override fun onPause() {
@@ -99,5 +116,15 @@ class MainActivity : AppCompatActivity() {
         val asyncSubject = AsyncSubject.create<String>()
         Observable.just("a", "b", "g").subscribe(asyncSubject)
         return asyncSubject
+    }
+
+    /**
+     * Returns a BehaviourSubject.
+     */
+    private fun getBehaviourSubject(): BehaviorSubject<String> {
+        // BehaviourSubject returns the most recent emitted item before subscribing, and all following emissions.
+        val behaviourSubject = BehaviorSubject.create<String>()
+        Observable.just("a", "b", "g").subscribe(behaviourSubject)
+        return behaviourSubject
     }
 }
